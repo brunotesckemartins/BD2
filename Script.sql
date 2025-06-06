@@ -159,7 +159,17 @@ INSERT INTO USUARIO (nome, email, senha, cargo) VALUES
 ('Beatriz Nunes', 'beatriz@empresa.com', 'senha123', 'Administrador'),
 ('Renato Campos', 'renato@empresa.com', 'senha123', 'Suporte');
 
-
+-- faz relacao entre pedido e usuario
+ALTER TABLE PEDIDO ADD COLUMN id_usuario INT;
+ALTER TABLE PEDIDO ADD CONSTRAINT fk_usuario FOREIGN KEY (id_usuario) REFERENCES USUARIO(id_usuario);
+-- faz relacao entre forma de pedido e forma de pagamento 
+ALTER TABLE PEDIDO ADD COLUMN id_forma_pagamento INT;
+ALTER TABLE PEDIDO ADD CONSTRAINT fk_forma_pagamento FOREIGN KEY (id_forma_pagamento) REFERENCES FORMA_PAGAMENTO(id_forma);
+--faz relacao entre conta a receber e forma de pagamento
+ALTER TABLE CONTA_RECEBER ADD COLUMN id_forma_pagamento INT;
+ALTER TABLE CONTA_RECEBER ADD CONSTRAINT fk_conta_forma_pagamento FOREIGN KEY (id_forma_pagamento) REFERENCES FORMA_PAGAMENTO(id_forma);
+-- essas alteracoes fazem a relacao de quem realizou cada pedido, como cada pedido foi feito
+-- e como cada conta a receber foi quitada
 
 
 
