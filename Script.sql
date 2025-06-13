@@ -360,7 +360,7 @@ BEGIN
         FROM produto
         WHERE estoque = 0
     LOOP
-        INSERT INTO log_estoque (mensagem, data, id_produto)
+        INSERT INTO log (mensagem, data, id_produto)
         VALUES (
             FORMAT('[ALERTA] Produto "%s" está com estoque zerado!', produto.nome),
             NOW(),
