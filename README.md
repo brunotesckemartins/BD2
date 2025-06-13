@@ -1,36 +1,70 @@
-#Sistema financeiro - Banco de Dados PostgreSQL
+# BD2 - Sistema Financeiro em PostgreSQL
 
-Este repositório contém a implementação completa de um sistema financeiro básico utilizando PostgreSQL, desenvolvido como parte de estudos/prática em banco de dados. Inclui:
+Este projeto é um sistema financeiro desenvolvido com foco em gerenciamento de clientes, fornecedores, produtos, pedidos de venda e compra, atendimentos e movimentações financeiras. A base de dados foi modelada para atender a uma empresa que necessita controlar todo o ciclo financeiro e operacional, incluindo histórico de pedidos, controle de estoque e registros de atendimento.
 
-    Modelagem de dados para controle financeiro pessoal
+O arquivo principal do projeto é o Script.sql, que contém a criação das tabelas, relacionamentos, funções, triggers e índices que garantem a integridade e performance do banco de dados.
 
-    Mecanismos de automação via triggers
+##Estrutura do Banco de Dados
 
-    Funções para cálculos financeiros
+O banco possui as seguintes principais entidades:
 
-    Otimizações de performance com índices
+    CLIENTE: Cadastro de clientes da empresa.
 
-Objetivo Principal: Demonstrar a aplicação de conceitos avançados de PostgreSQL como triggers, functions e índices em um contexto real de gestão financeira.
+    FORNECEDOR: Cadastro de fornecedores.
 
-#Como Executar (via SSH)
+    PRODUTO: Registro dos produtos comercializados.
 
-git clone git@github.com:brunotesckemartins/BD2.git
-cd BD2
-psql -U seu_usuario -d nome_banco -f database/script.sql
+    PEDIDOVENDA / ITEMPEDIDOVENDA: Pedidos de venda realizados e seus itens.
 
-#Diagrama 
+    PEDIDOCOMPRA / ITEMPEDIDOCOMPRA: Pedidos de compra e seus itens para controle de estoque.
+
+    ATENDIMENTO: Registro de atendimentos realizados para clientes.
+
+    FINANCEIRO: Controle das movimentações financeiras, incluindo contas a pagar e receber.
+
+    LOG: Armazena o histórico de alterações e operações no sistema, por meio de triggers.
+
+##Modelo completo : 
+
 (https://github.com/brunotesckemartins/BD2/blob/main/postgres%20-%20financeiro.png)
 
-#Como contribuir 
+##Tecnologias e Ferramentas
 
-# 1. Faça um fork via SSH
-git clone git@github.com:seu_usuario/BD2.git
+    Banco de Dados: PostgreSQL
 
-# 2. Crie uma branch
-git checkout -b minha-melhoria
+    SQL: DDL para criação de tabelas, DML para inserção e manipulação dos dados, consultas SQL para extração de informações.
 
-# 3. Commit suas alterações
-git commit -am "Descrição precisa das mudanças"
+    Triggers e Functions: Implementadas para automação de processos, validações e logs automáticos.
 
-# 4. Push
-git push origin minha-melhoria
+    Índices: Criados para otimizar consultas e melhorar performance.
+
+##Como usar
+1. Instale o PostgreSQL em seu ambiente local ou servidor.
+2. CLone este repositório :
+    ```bash
+   git@github.com:brunotesckemartins/BD2.git
+    ```
+4. Acesse a pasta do projeto :
+    ```bash
+    cd BD2
+    ```
+
+##Comentários importantes nos commits
+    Durante o desenvolvimento, foram destacados nos commits pontos importantes para o entendimento do código, principalmente em:
+
+    Triggers: Automatizam verificações e atualizações no banco.
+
+    Functions: Funções SQL que encapsulam lógicas complexas para reuso.
+
+    Índices e Índices compostos: Essenciais para otimizar o desempenho nas consultas mais frequentes.
+
+    acesse esses comentários em : (https://github.com/brunotesckemartins/BD2/commit/26d9c0842325ad24d8ff00599b24c3ce1cd2f530)
+
+##Repositório mantido por : Bruno Tescke Martins
+email : brunotesckemartins@gmail.com
+Github : https://github.com/brunotesckemartins
+
+##Colaboradores : Gabriel Tomé
+Tiago Fritzen Palácio
+
+   
