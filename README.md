@@ -4,29 +4,31 @@ Este projeto é um sistema financeiro desenvolvido com foco em gerenciamento de 
 
 O arquivo principal do projeto é o Script.sql, que contém a criação das tabelas, relacionamentos, funções, triggers e índices que garantem a integridade e performance do banco de dados.
 
-##Estrutura do Banco de Dados
+---
+ 
+## Estrutura do Banco de Dados
 
 O banco possui as seguintes principais entidades:
 
--CLIENTE: Cadastro de clientes da empresa.
+CLIENTE: Cadastro de clientes da empresa.
 
--FORNECEDOR: Cadastro de fornecedores.
+FORNECEDOR: Cadastro de fornecedores.
 
--PRODUTO: Registro dos produtos comercializados.
+PRODUTO: Registro dos produtos comercializados.
 
 -PEDIDOVENDA / ITEMPEDIDOVENDA: Pedidos de venda realizados e seus itens.
 
--PEDIDOCOMPRA / ITEMPEDIDOCOMPRA: Pedidos de compra e seus itens para controle de estoque.
+PEDIDOCOMPRA / ITEMPEDIDOCOMPRA: Pedidos de compra e seus itens para controle de estoque.
 
--ATENDIMENTO: Registro de atendimentos realizados para clientes.
+ATENDIMENTO: Registro de atendimentos realizados para clientes.
 
--FINANCEIRO: Controle das movimentações financeiras, incluindo contas a pagar e receber.
+FINANCEIRO: Controle das movimentações financeiras, incluindo contas a pagar e receber.
 
--LOG: Armazena o histórico de alterações e operações no sistema, por meio de triggers.
+LOG: Armazena o histórico de alterações e operações no sistema, por meio de triggers.
 
 ---
 
-##Modelo completo : 
+## Modelo completo : 
 
  Veja o modelo completo [aqui](https://github.com/brunotesckemartins/BD2/blob/main/postgres%20-%20financeiro.png)
 
@@ -34,17 +36,17 @@ O banco possui as seguintes principais entidades:
 
 ##Tecnologias e Ferramentas
 
--Banco de Dados: PostgreSQL
+Banco de Dados: PostgreSQL
 
--SQL: DDL para criação de tabelas, DML para inserção e manipulação dos dados, consultas SQL para extração de informações.
+SQL: DDL para criação de tabelas, DML para inserção e manipulação dos dados, consultas SQL para extração de informações.
 
--Triggers e Functions: Implementadas para automação de processos, validações e logs automáticos.
+Triggers e Functions: Implementadas para automação de processos, validações e logs automáticos.
 
--Índices: Criados para otimizar consultas e melhorar performance.
+Índices: Criados para otimizar consultas e melhorar performance.
 
 ---
 
-##Como usar
+## Como usar
 
 1. Instale o PostgreSQL em seu ambiente local ou servidor.
 
@@ -56,26 +58,33 @@ O banco possui as seguintes principais entidades:
     ```bash
     cd BD2
     ```
+---
 
-##Comentários importantes nos commits
+## Comentários importantes nos commits
 
--Durante o desenvolvimento, foram destacados nos commits pontos importantes para o entendimento do código, principalmente em:
+Durante o desenvolvimento, foram destacados nos commits pontos importantes para o entendimento do código, principalmente em:
 
--Triggers: Automatizam verificações e atualizações no banco.
+Triggers: Automatizam verificações e atualizações no banco.
 
--Functions: Funções SQL que encapsulam lógicas complexas para reuso.
+Functions: Funções SQL que encapsulam lógicas complexas para reuso.
 
--Índices e Índices compostos: Essenciais para otimizar o desempenho nas consultas mais frequentes.
+Índices e Índices compostos: Essenciais para otimizar o desempenho nas consultas mais frequentes.
 
 [acesse esses comentários](https://github.com/brunotesckemartins/BD2/commit/26d9c0842325ad24d8ff00599b24c3ce1cd2f530)
 
-##Repositório mantido por : Bruno Tescke Martins
+---
+
+## Repositório mantido por : 
+
+Bruno Tescke Martins
 email : brunotesckemartins@gmail.com
 [Github](https://github.com/brunotesckemartins)
 
 ---
 
-##Colaboradores : Gabriel Tomé  [GitHub](https://github.com/GabrielTME)
+## Colaboradores :
+
+Gabriel Tomé  [GitHub](https://github.com/GabrielTME)
 
 Tiago Fritzen Palácio   [GitHub](https://github.com/TiagoPalacio)
 
