@@ -10,7 +10,7 @@ O diretório `database/` contém os scripts SQL para a criação de tabelas, rel
 
 ## Modelo do Banco de Dados
 
-Veja o modelo relacional completo [aqui](https://github.com/brunotesckemartins/BD2/blob/main/postgres%20-%20financeiro.png).
+Veja o modelo relacional completo ![aqui](https://github.com/brunotesckemartins/BD2/blob/main/postgres%20-%20financeiro.png).
 
 ---
 
