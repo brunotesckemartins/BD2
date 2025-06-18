@@ -16,19 +16,22 @@ Veja o modelo relacional completo [aqui](https://github.com/brunotesckemartins/B
 
 ## Estrutura do Projeto
 
+## Estrutura do Projeto
+
+```text
 ├── database/
-│ ├── ddl/ddl.sql # Criação das tabelas e relacionamentos
-│ ├── dml/dml.sql # Inserção de dados de exemplo
-│ └── procedures/procedures.sql # Funções, Views, Triggers e Índices
+│   ├── ddl/ddl.sql               # Criação das tabelas e relacionamentos
+│   ├── dml/dml.sql               # Inserção de dados de exemplo
+│   └── procedures/procedures.sql # Funções, Views, Triggers e Índices
 │
 └── frontend/
-├── public/
-└── src/ # Código-fonte da aplicação React
-├── pages/ # Componentes de página (CRUD e Relatórios)
-├── services/ # Configuração do Axios (api.js)
-├── App.jsx # Componente principal e rotas
-└── main.jsx # Ponto de entrada da aplicação
-
+    ├── public/
+    └── src/                      # Código-fonte da aplicação React
+        ├── pages/              # Componentes de página (CRUD e Relatórios)
+        ├── services/           # Configuração do Axios (api.js)
+        ├── App.jsx             # Componente principal e rotas
+        └── main.jsx            # Ponto de entrada da aplicação
+```
 
 ---
 
