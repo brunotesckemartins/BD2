@@ -16,8 +16,6 @@ Veja o modelo relacional completo [aqui](https://github.com/brunotesckemartins/B
 
 ## Estrutura do Projeto
 
-## Estrutura do Projeto
-
 ```text
 ├── database/
 │   ├── ddl/ddl.sql               # Criação das tabelas e relacionamentos
