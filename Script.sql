@@ -478,9 +478,3 @@ CREATE INDEX idx_itempedido_id_pedido ON item_pedido(id_pedido);
 
 
 
-
-
-
-
-
-
