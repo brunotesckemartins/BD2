@@ -6,13 +6,9 @@ A base de dados foi modelada para atender a uma empresa que necessita controlar 
 
 O diretório `database/` contém os scripts SQL para a criação de tabelas, relacionamentos, funções, triggers e índices que garantem a integridade e performance do banco de dados. O diretório `frontend/` contém a aplicação React (Vite) para interação com o sistema.
 
----
-
 ## Modelo do Banco de Dados
 
-Veja o modelo relacional completo ![aqui](https://github.com/brunotesckemartins/BD2/blob/main/postgres%20-%20financeiro.png).
-
----
+Veja o modelo relacional completo: ![](https://github.com/brunotesckemartins/BD2/blob/main/postgres%20-%20financeiro.png)
 
 ## Estrutura do Projeto
 
@@ -24,14 +20,12 @@ Veja o modelo relacional completo ![aqui](https://github.com/brunotesckemartins/
 │
 └── frontend/
     ├── public/
-    └── src/                      # Código-fonte da aplicação React
+    └── src/                    # Código-fonte da aplicação React
         ├── pages/              # Componentes de página (CRUD e Relatórios)
         ├── services/           # Configuração do Axios (api.js)
         ├── App.jsx             # Componente principal e rotas
         └── main.jsx            # Ponto de entrada da aplicação
 ```
-
----
 
 ## Tecnologias Utilizadas
 
@@ -48,15 +42,13 @@ Veja o modelo relacional completo ![aqui](https://github.com/brunotesckemartins/
 *   **Geral:**
     *   **Controle de Versão:** Git & GitHub
 
----
-
 ## Como Executar a Aplicação Completa
 
 Siga os passos abaixo para configurar e rodar o ambiente de desenvolvimento localmente.
 
 ### Pré-requisitos
 
-*   [Node.js](https://nodejs.org/) (versão 18 ou superior)
+*   [Node.js](https://nodejs.org/)
 *   [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/)
 *   [PostgreSQL](https://www.postgresql.org/download/) instalado e rodando.
 
@@ -123,8 +115,6 @@ Com o banco de dados e a API rodando, vamos iniciar o frontend.
 
 Agora você deve ver a aplicação web funcionando e se comunicando com o seu banco de dados através da API.
 
----
-
 ## Comentários importantes nos commits
 
 Durante o desenvolvimento, foram destacados nos commits pontos importantes para o entendimento do código, principalmente em:
@@ -133,17 +123,13 @@ Durante o desenvolvimento, foram destacados nos commits pontos importantes para 
 *   **Functions:** Funções SQL que encapsulam lógicas complexas para reuso.
 *   **Índices e Índices compostos:** Essenciais para otimizar o desempenho nas consultas mais frequentes.
 
-[Acesse esses comentários](https://github.com/brunotesckemartins/BD2/commit/26d9c0842325ad24d8ff00599b24c3ce1cd2f530)
-
----
+Acesse esses comentários [aqui.](https://github.com/brunotesckemartins/BD2/commit/26d9c0842325ad24d8ff00599b24c3ce1cd2f530)
 
 ## Repositório mantido por:
 
 **Bruno Tescke Martins**
-*   Email: brunotesckemartins@gmail.com
+*   E-mail: brunotesckemartins@gmail.com
 *   [Github](https://github.com/brunotesckemartins)
-
----
 
 ## Colaboradores:
 
