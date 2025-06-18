@@ -58,7 +58,7 @@ Primeiro, vamos preparar o banco de dados.
 
 1.  **Clone este repositório:**
     ```bash
-    git clone https://github.com/brunotesckemartins/BD2.git
+    git clone git@github.com:brunotesckemartins/BD2.git
     cd BD2
     ```
 2.  **Crie a base de dados no PostgreSQL.** Você pode usar um cliente como DBeaver, pgAdmin, ou o terminal `psql`:
