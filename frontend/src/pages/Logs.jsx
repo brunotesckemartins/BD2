@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
-// Estilos simples para a tabela
+// --- Estilos básicos para a tabela ---
 const tableStyle = { width: '100%', borderCollapse: 'collapse' };
 const thTdStyle = { border: '1px solid #ddd', padding: '8px', textAlign: 'left' };
 
+// --- Componente Principal da Página ---
 function Logs() {
+  // --- Estados do componente ---
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Carrega os logs da API quando o componente monta
+  // --- Carrega os logs da API ao iniciar ---
   useEffect(() => {
     async function fetchLogs() {
       try {
         const response = await api.get('/logs');
+
         // Ordena os logs do mais recente para o mais antigo
         const sortedLogs = response.data.sort((a, b) => new Date(b.data) - new Date(a.data));
         setLogs(sortedLogs);
@@ -23,9 +26,11 @@ function Logs() {
         setLoading(false);
       }
     }
+
     fetchLogs();
   }, []);
 
+  // --- Exibe carregamento enquanto busca os dados ---
   if (loading) {
     return <p>Carregando logs do sistema...</p>;
   }
@@ -35,6 +40,7 @@ function Logs() {
       <h1>Logs do Sistema</h1>
       <p>Exibe os registros de eventos importantes do sistema.</p>
 
+      {/* --- Tabela de Logs --- */}
       <table style={tableStyle}>
         <thead>
           <tr>

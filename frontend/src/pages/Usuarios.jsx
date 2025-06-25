@@ -2,20 +2,21 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
 // --- Componente Modal ---
+// Modal genérico para exibir formulários de adicionar/editar usuários
 const Modal = ({ children, isOpen, onClose }) => {
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Não renderiza nada se não estiver aberto
 
   const backdropStyle = {
-    position: 'fixed',
+    position: 'fixed', // Fica fixo na tela toda
     top: 0,
     left: 0,
     width: '100%',
     height: '100%',
-    background: 'rgba(0, 0, 0, 0.5)',
+    background: 'rgba(0, 0, 0, 0.5)', // Fundo escurecido semi-transparente
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
+    zIndex: 1000, // Fica acima de outros elementos
   };
 
   const modalStyle = {
@@ -24,11 +25,13 @@ const Modal = ({ children, isOpen, onClose }) => {
     borderRadius: '8px',
     width: '90%',
     maxWidth: '500px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)', // Sombra leve para dar destaque
   };
 
   return (
+    // Ao clicar no fundo, fecha o modal
     <div style={backdropStyle} onClick={onClose}>
+      {/* Evita fechar o modal ao clicar dentro da caixa */}
       <div style={modalStyle} onClick={e => e.stopPropagation()}>
         {children}
       </div>
@@ -39,16 +42,20 @@ const Modal = ({ children, isOpen, onClose }) => {
 
 // --- Componente Principal da Página ---
 function Usuarios() {
-  // Estados para os dados
+  // Estados para armazenar os dados dos usuários
   const [usuarios, setUsuarios] = useState([]);
   
-  // Estados para controle da UI
+  // Estados para controle da interface (loading e erros)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Controle da abertura do modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Estados para o formulário
+  // Estado que armazena o usuário que está sendo editado (null para adicionar)
   const [editingUsuario, setEditingUsuario] = useState(null);
+
+  // Estado que armazena os dados do formulário
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -56,7 +63,7 @@ function Usuarios() {
     cargo: '',
   });
 
-  // Efeito para buscar os dados da API
+  // Efeito que busca os usuários na API ao montar o componente
   useEffect(() => {
     async function fetchUsuarios() {
       setLoading(true);
@@ -74,14 +81,14 @@ function Usuarios() {
     fetchUsuarios();
   }, []);
 
-  // Funções para controlar o Modal
+  // Abre o modal e, se for edição, preenche o formulário com os dados existentes
   const handleOpenModal = (usuario = null) => {
     if (usuario) {
       setEditingUsuario(usuario);
       setFormData({
         nome: usuario.nome,
         email: usuario.email,
-        senha: '', // Senha fica em branco por segurança
+        senha: '', // Senha fica em branco por segurança (não mostra senha)
         cargo: usuario.cargo || '',
       });
     } else {
@@ -91,50 +98,58 @@ function Usuarios() {
     setIsModalOpen(true);
   };
 
+  // Fecha o modal e reseta o estado de edição
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingUsuario(null);
   };
   
+  // Atualiza o estado do formulário ao digitar/alterar um campo
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Trata o envio do formulário para adicionar ou editar usuário
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    // Validação básica de campos obrigatórios
     if (!formData.nome || !formData.email) {
       alert("Por favor, preencha nome e email.");
       return;
     }
 
+    // Monta o objeto que será enviado para a API
     const dataToSubmit = {
-        nome: formData.nome,
-        email: formData.email,
-        cargo: formData.cargo,
+      nome: formData.nome,
+      email: formData.email,
+      cargo: formData.cargo,
     };
     
     if (editingUsuario) {
-        // Ao editar, só envie a senha se uma nova foi digitada
-        if (formData.senha) {
-            dataToSubmit.senha = formData.senha;
-        }
-    } else {
-        // Ao adicionar, a senha é obrigatória
-        if (!formData.senha) {
-            alert("A senha é obrigatória para novos usuários.");
-            return;
-        }
+      // Ao editar, só envia a senha se o usuário digitou uma nova
+      if (formData.senha) {
         dataToSubmit.senha = formData.senha;
+      }
+    } else {
+      // Ao adicionar, senha é obrigatória
+      if (!formData.senha) {
+        alert("A senha é obrigatória para novos usuários.");
+        return;
+      }
+      dataToSubmit.senha = formData.senha;
     }
 
     try {
       if (editingUsuario) {
+        // Atualiza usuário existente via PUT
         const response = await api.put(`/usuarios/${editingUsuario.id_usuario}`, dataToSubmit);
+        // Atualiza o estado local substituindo o usuário editado
         setUsuarios(usuarios.map(u => (u.id_usuario === editingUsuario.id_usuario ? response.data[0] : u)));
         alert("Usuário atualizado com sucesso!");
       } else {
+        // Cria novo usuário via POST
         const response = await api.post('/usuarios', dataToSubmit);
         setUsuarios([...usuarios, response.data[0]]);
         alert("Usuário adicionado com sucesso!");
@@ -146,10 +161,12 @@ function Usuarios() {
     }
   };
 
+  // Função para deletar usuário após confirmação
   const handleDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja remover este usuário?")) {
       try {
         await api.delete(`/usuarios/${id}`);
+        // Remove o usuário deletado da lista local
         setUsuarios(usuarios.filter(u => u.id_usuario !== id));
         alert("Usuário removido com sucesso!");
       } catch (err) {
@@ -159,7 +176,7 @@ function Usuarios() {
     }
   };
 
-  // --- Estilos ---
+  // --- Estilos inline para tabela e botões ---
   const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px' };
   const thTdStyle = { border: '1px solid #ddd', padding: '12px', textAlign: 'left' };
   const buttonStyle = { marginRight: '8px', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' };
@@ -170,9 +187,11 @@ function Usuarios() {
   const labelStyle = { display: 'block', marginBottom: '5px', fontWeight: 'bold' };
   const inputStyle = { width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ccc' };
 
+  // Exibe loading ou erro se necessário
   if (loading) return <p>Carregando usuários...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
+  // Renderiza a página com tabela e modal
   return (
     <div>
       <h1>Gerenciamento de Usuários</h1>
@@ -206,7 +225,7 @@ function Usuarios() {
         </tbody>
       </table>
 
-      {/* --- Modal de Adicionar/Editar --- */}
+      {/* --- Modal para adicionar ou editar usuário --- */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2>{editingUsuario ? 'Editar Usuário' : 'Adicionar Novo Usuário'}</h2>
         <form onSubmit={handleFormSubmit}>
@@ -220,7 +239,14 @@ function Usuarios() {
           </div>
           <div style={formGroupStyle}>
             <label style={labelStyle}>Senha{editingUsuario ? ' (opcional)' : '*'}</label>
-            <input type="password" name="senha" value={formData.senha} onChange={handleFormChange} style={inputStyle} placeholder={editingUsuario ? "Deixe em branco para não alterar" : ""} />
+            <input
+              type="password"
+              name="senha"
+              value={formData.senha}
+              onChange={handleFormChange}
+              style={inputStyle}
+              placeholder={editingUsuario ? "Deixe em branco para não alterar" : ""}
+            />
           </div>
           <div style={formGroupStyle}>
             <label style={labelStyle}>Cargo</label>
