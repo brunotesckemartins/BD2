@@ -13,7 +13,6 @@ import Usuarios from './pages/Usuarios';
 import Logs from './pages/Logs';
 
 // Páginas de relatórios
-import RelatorioVendas from './pages/relatorios/RelatorioVendas';
 import RelatorioClientesVip from './pages/relatorios/RelatorioClientesVip';
 import RelatorioFinanceiro from './pages/relatorios/RelatorioFinanceiro';
 
@@ -147,9 +146,6 @@ function App() {
               <Link to="/relatorios/clientes-vip" style={location.pathname === '/relatorios/clientes-vip' ? activeLinkStyle : navLinkStyle}>Clientes VIP</Link>
             </li>
             <li style={navItemStyle}>
-              <Link to="/relatorios/vendas" style={location.pathname === '/relatorios/vendas' ? activeLinkStyle : navLinkStyle}>Resumo de Vendas</Link>
-            </li>
-            <li style={navItemStyle}>
               <Link to="/logs" style={location.pathname === '/logs' ? activeLinkStyle : navLinkStyle}>Logs do Sistema</Link>
             </li>
           </ul>
@@ -175,7 +171,6 @@ function App() {
           {/* Rotas Relatórios */}
           <Route path="/relatorios/financeiro" element={<RelatorioFinanceiro />} />
           <Route path="/relatorios/clientes-vip" element={<RelatorioClientesVip />} />
-          <Route path="/relatorios/vendas" element={<RelatorioVendas />} />
 
           {/* Rota fallback para páginas não encontradas */}
           <Route path="*" element={<div><h2>Página não encontrada!</h2></div>} />
