@@ -254,58 +254,69 @@ SELECT * FROM pedidos_acima_da_media();
 CREATE OR REPLACE PROCEDURE procedure_produtos_estagnados()
 LANGUAGE plpgsql
 AS $$
+DECLARE
+  produto_estagnado RECORD;
 BEGIN
-    RAISE NOTICE 'Produtos estagnados nos últimos 3 meses:';
-    RAISE NOTICE 'id_produto | nome';
+  RAISE NOTICE 'Produtos estagnados nos últimos 3 meses:';
+  RAISE NOTICE 'id_produto | nome';
 
-    PERFORM (
-        SELECT pr.id_produto, pr.nome
-        FROM produto pr
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM itempedidovenda ip
-            JOIN pedido p ON ip.id_pedido = p.id_pedido
-            WHERE ip.id_produto = pr.id_produto
-              AND p.status = 'FINALIZADO'
-              AND p.data_pedido >= CURRENT_DATE - INTERVAL '3 months'
-        )
-        ORDER BY pr.nome
-    );
+  FOR produto_estagnado IN
+    SELECT pr.id_produto, pr.nome
+    FROM produto pr
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM item_pedido ip
+      JOIN pedido p ON ip.id_pedido = p.id_pedido
+      WHERE ip.descricao = pr.nome
+        AND p.status = 'FINALIZADO'
+        AND p.data_pedido >= CURRENT_DATE - INTERVAL '3 months'
+    )
+    ORDER BY pr.nome
+  LOOP
+    RAISE NOTICE '% | %', produto_estagnado.id_produto, produto_estagnado.nome;
+  END LOOP;
 END;
 $$;
+
+
 
 --2.Mostra o cliente que mais gastou em cada mês do ano atual.
-CREATE OR REPLACE PROCEDURE procedure_top_clientes_cada_mes(
-    ano INT DEFAULT EXTRACT(YEAR FROM CURRENT_DATE)
-)
+CREATE OR REPLACE PROCEDURE procedure_top_clientes_cada_mes(ano INT)
 LANGUAGE plpgsql
 AS $$
+DECLARE
+  v_mes INT;
+  v_id_cliente INT;
+  v_nome TEXT;
+  v_total_gasto NUMERIC;
 BEGIN
-    RAISE NOTICE 'Top cliente por mês no ano %:', ano;
-    RAISE NOTICE 'mês | id_cliente | nome | total_gasto';
+  RAISE NOTICE 'Top cliente por mês no ano %:', ano;
 
-    PERFORM (
-        WITH total_mes AS (
-            SELECT 
-                EXTRACT(MONTH FROM p.data_pedido) AS mes,
-                c.id_cliente,
-                c.nome,
-                SUM(p.valor_total) AS total_gasto,
-                RANK() OVER (PARTITION BY EXTRACT(MONTH FROM p.data_pedido)
-                             ORDER BY SUM(p.valor_total) DESC) AS pos
-            FROM cliente c
-            JOIN pedido p ON c.id_cliente = p.id_cliente
-            WHERE EXTRACT(YEAR FROM p.data_pedido) = ano
-              AND p.status = 'FINALIZADO'
-            GROUP BY mes, c.id_cliente, c.nome
-        )
-        SELECT mes, id_cliente, nome, total_gasto
-        FROM total_mes
-        WHERE pos = 1
-        ORDER BY mes
-    );
+  FOR v_mes, v_id_cliente, v_nome, v_total_gasto IN
+    WITH total_mes AS (
+      SELECT 
+        EXTRACT(MONTH FROM p.data_pedido) AS mes,
+        c.id_cliente,
+        c.nome,
+        SUM(p.valor_total) AS total_gasto,
+        RANK() OVER (PARTITION BY EXTRACT(MONTH FROM p.data_pedido)
+                     ORDER BY SUM(p.valor_total) DESC) AS pos
+      FROM cliente c
+      JOIN pedido p ON c.id_cliente = p.id_cliente
+      WHERE EXTRACT(YEAR FROM p.data_pedido) = ano
+        AND p.status = 'FINALIZADO'
+      GROUP BY mes, c.id_cliente, c.nome
+    )
+    SELECT mes, id_cliente, nome, total_gasto
+    FROM total_mes
+    WHERE pos = 1
+    ORDER BY mes
+  LOOP
+    RAISE NOTICE '% | % | % | %', v_mes, v_id_cliente, v_nome, v_total_gasto;
+  END LOOP;
 END;
 $$;
+
 
 --3.Detecta produtos esgotados e ainda à venda.
 CREATE OR REPLACE PROCEDURE procedure_alerta_produto_sem_estoque()
@@ -332,6 +343,8 @@ END;
 $$;
 
 
+CALL procedure_alerta_produto_sem_estoque();
+
 ----------------------------------------------------------
 				--TRIGGER--
 ----------------------------------------------------------
@@ -340,36 +353,41 @@ $$;
 CREATE OR REPLACE FUNCTION bloquear_pagamento_duplicado()
 RETURNS TRIGGER AS $$
 DECLARE
-    id_produto_exemplo INT := (SELECT id_produto FROM PRODUTO LIMIT 1); -- só para preencher o campo obrigatório
+    id_produto_exemplo INT := (SELECT id_produto FROM PRODUTO LIMIT 1); -- preenche FK do LOG
     mensagem TEXT;
 BEGIN
+    -- Se já existir pagamento igual (mesmo pedido, valor e data)
     IF EXISTS (
-        SELECT 1 FROM CONTA_RECEBER
-        WHERE id_pedido = NEW.id_pedido
-          AND valor = NEW.valor
+        SELECT 1
+        FROM CONTA_RECEBER
+        WHERE id_pedido      = NEW.id_pedido
+          AND valor          = NEW.valor
           AND data_pagamento = NEW.data_pagamento
           AND data_pagamento IS NOT NULL
     ) THEN
+    
         mensagem := FORMAT(
-            '[ALERTA] Pagamento duplicado detectado para pedido ID %s! Valor: %.2f, Data: %s',
-            NEW.id_pedido, NEW.valor, TO_CHAR(NEW.data_pagamento, 'YYYY-MM-DD')
+            '[ALERTA] Pagamento duplicado detectado para pedido ID %s! Valor: %s, Data: %s',
+            NEW.id_pedido,
+            TO_CHAR(NEW.valor, 'FM999999999.00'),          -- 2 casas decimais
+            TO_CHAR(NEW.data_pagamento, 'YYYY-MM-DD')
         );
 
         INSERT INTO LOG (id_produto, mensagem, data)
         VALUES (id_produto_exemplo, mensagem, NOW());
 
-        RAISE EXCEPTION '%', mensagem;
+        RAISE EXCEPTION '%', mensagem;  -- cancela a inserção
     END IF;
 
-    RETURN NEW;
+    RETURN NEW;  -- segue o fluxo se não houver duplicidade
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER tg_bloquear_pagamento_duplicado
+
+CREATE OR REPLACE TRIGGER tg_bloquear_pagamento_duplicado
 BEFORE INSERT ON CONTA_RECEBER
 FOR EACH ROW
 EXECUTE FUNCTION bloquear_pagamento_duplicado();
-
 
 ----------------------------------------------------------
 				--VIEWS E INDICES--
@@ -425,4 +443,3 @@ CREATE INDEX idx_pedido_status ON pedido(status);
 CREATE INDEX idx_pedido_data_pedido ON pedido(data_pedido);
 CREATE INDEX idx_pedido_id_cliente ON pedido(id_cliente);
 CREATE INDEX idx_itempedido_id_pedido ON item_pedido(id_pedido);
-
