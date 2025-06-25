@@ -75,9 +75,8 @@ Primeiro, vamos preparar o banco de dados.
     CREATE DATABASE bd2_projeto;
     ```
 3.  **Execute os scripts SQL na ordem correta.** Conecte-se à base de dados `bd2_projeto` que você acabou de criar e execute os seguintes arquivos:
-    *   `database/ddl/ddl.sql` (para criar as tabelas)
-    *   `database/dml/dml.sql` (para popular com dados de exemplo)
-    *   `database/procedures/procedures.sql` (para criar as views, funções, etc.)
+
+    * `Script.sql`
 
 ### 2. Backend - Configuração da API
 
@@ -85,7 +84,10 @@ A aplicação React precisa de uma API para se comunicar com o banco de dados.
 
 **Nota:** Estas instruções assumem que você possui um servidor de API (ex: Node.js/Express) em um diretório separado. Adapte os nomes e comandos conforme a sua estrutura.
 
-1.  **Navegue até o diretório da sua API.**
+1.  **Abra um novo terminal** e navegue para a pasta `backend`:
+    ```bash
+    cd backend
+    ```
 2.  **Instale as dependências do backend:**
     ```bash
     npm install
