@@ -1,5 +1,14 @@
 # BD2 - Sistema Financeiro em PostgreSQL
 
+![PostgreSQL](https://img.shields.io/badge/Banco%20de%20Dados-PostgreSQL-blue?logo=postgresql)
+![PLpgSQL](https://img.shields.io/badge/Scripting-PL%2FpgSQL-lightgrey)
+![SQL](https://img.shields.io/badge/SQL-DDL%20%7C%20DML%20%7C%20DQL-yellow)
+![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)
+![Vite](https://img.shields.io/badge/Build-Vite-purple?logo=vite)
+![Axios](https://img.shields.io/badge/HTTP-Axios-ff69b4)
+![Git](https://img.shields.io/badge/VersionControl-Git%20%26%20GitHub-black?logo=git)
+![Status](https://img.shields.io/badge/Project-Completed-brightgreen)
+
 Este projeto é um sistema de gestão completo desenvolvido com um backend em PostgreSQL e um frontend interativo em React. O sistema permite o gerenciamento de clientes, produtos, pedidos, usuários e finanças, com um frontend projetado para facilitar a interação e manipulação dos dados.
 
 A base de dados foi modelada para atender a uma empresa que necessita controlar seu ciclo de vendas e financeiro, incluindo histórico de pedidos, contas a receber e logs de operações.
