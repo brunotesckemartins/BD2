@@ -178,21 +178,20 @@ router.get('/view/clientes_vip', (req, res) => executeQuery(res, 'SELECT * FROM 
 // =================================================================
 // --- ROTAS PARA FUNCTIONS (SOMENTE LEITURA) ---
 // =================================================================
-router.get('/functions/relatorio_financeiro', (req, res) => {
-  // Parâmetros são opcionais, a função tem valores padrão
-  const { data_inicio = null, data_fim = null } = req.query; // Ex: /api/functions/relatorio_financeiro?data_inicio=2025-01-01&data_fim=2025-06-01
+
+router.get('/relatorios/financeiro', (req, res) => {
+  const { data_inicio = null, data_fim = null } = req.query;
   executeQuery(res, 'SELECT * FROM relatorio_financeiro($1, $2)', [data_inicio, data_fim]);
 });
 
-router.get('/functions/clientes_fieis', (req, res) => {
-  // Parâmetros são opcionais, a função tem valores padrão
-  const { min_pedidos = null, data_inicio = null, data_fim = null } = req.query;
-  executeQuery(res, 'SELECT * FROM clientes_fieis($1, $2, $3)', [min_pedidos, data_inicio, data_fim]);
+router.get('/relatorios/clientes-vip', (req, res) => {
+  executeQuery(res, 'SELECT * FROM view_clientes_vip');
 });
 
-router.get('/functions/pedidos_acima_media', (req, res) => {
-    executeQuery(res, 'SELECT * FROM pedidos_acima_da_media()');
+router.get('/relatorios/resumo-vendas', (req, res) => {
+  executeQuery(res, 'SELECT * FROM view_resumo_vendas_mensal');
 });
+
 
 
 // Exporta o router para ser usado no server.js

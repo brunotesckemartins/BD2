@@ -1,3 +1,149 @@
+/*====================================================================
+  VISÃO GERAL — TIPOS DE OBJETOS NO SCRIPT
+  --------------------------------------------------------------------
+  • FUNCTIONS  : retornam dados (relatórios, cálculos, filtros reutilizáveis)
+  • PROCEDURES : executam ações administrativas / de manutenção
+  • TRIGGERS   : gatilhos automáticos disparados em INSERT/UPDATE/DELETE
+  • VIEWS      : consultas salvas como “tabelas virtuais” para relatórios
+====================================================================*/
+
+/*====================================================================
+  FUNCTIONS
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  FUNCTION: relatorio_financeiro(
+              data_inicio DATE DEFAULT CURRENT_DATE-INTERVAL '1 month',
+              data_fim    DATE DEFAULT CURRENT_DATE)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Para cada cliente devolve:
+      - total de pedidos
+      - total pago
+      - total pendente
+      - quantidade de pedidos em atraso
+  ➤ Como usar:
+      SELECT * FROM relatorio_financeiro('2025-06-01','2025-06-30');
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  FUNCTION: clientes_fieis(
+              min_pedidos INT DEFAULT 1,
+              data_inicio DATE DEFAULT '2020-01-01',
+              data_fim    DATE DEFAULT CURRENT_DATE)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Lista clientes que fizeram pelo menos <min_pedidos>
+      pedidos FINALIZADOS no intervalo.
+    • Calcula o ticket médio (valor médio gasto por pedido).
+  ➤ Como usar:
+      SELECT * FROM clientes_fieis(2,'2025-06-01','2025-06-30');
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  FUNCTION: pedidos_acima_da_media()
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Devolve todos os pedidos cujo valor_total é maior
+      que a média de todos os pedidos.
+  ➤ Como usar:
+      SELECT * FROM pedidos_acima_da_media();
+--------------------------------------------------------------------*/
+
+/*====================================================================
+  PROCEDURES
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  PROCEDURE: procedure_alerta_produto_sem_estoque()
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Procura produtos com estoque = 0.
+    • Insere alerta na tabela LOG e exibe RAISE NOTICE.
+  ➤ Como usar:
+      CALL procedure_alerta_produto_sem_estoque();
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  PROCEDURE: procedure_top_clientes_cada_mes(ano INT DEFAULT ano atual)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Para cada mês do ano informado mostra, via NOTICE,
+      o cliente que mais gastou (pedidos FINALIZADOS).
+  ➤ Como usar:
+      CALL procedure_top_clientes_cada_mes(2025);
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  PROCEDURE: procedure_produtos_estagnados()
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Lista produtos sem nenhuma venda FINALIZADA
+      nos últimos 3 meses (RAISE NOTICE linha a linha).
+  ➤ Como usar:
+      CALL procedure_produtos_estagnados();
+--------------------------------------------------------------------*/
+
+/*====================================================================
+  TRIGGERS
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  TRIGGER: tg_bloquear_pagamento_duplicado  (BEFORE INSERT ON CONTA_RECEBER)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Impede lançar duas vezes o mesmo pagamento (mesmo id_pedido,
+      valor e data_pagamento).
+    • Quando detecta duplicidade:
+        - grava alerta na tabela LOG
+        - lança EXCEPTION cancelando o INSERT
+  ➤ Como testar:
+      -- 1ª inserção OK
+      INSERT INTO conta_receber (..., valor, data_pagamento) VALUES (...);
+      -- 2ª (mesmos valores) → erro gerado pelo trigger
+--------------------------------------------------------------------*/
+
+/*====================================================================
+  VIEWS
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  VIEW: view_resumo_vendas_mensal
+  --------------------------------------------------------------------
+  ➤ Conteúdo:
+    • mês (DATE_TRUNC 'month')
+    • total_pedidos  – quantidade de pedidos FINALIZADOS no mês
+    • total_vendido  – soma valor_total desses pedidos
+  ➤ Consulta:
+      SELECT * FROM view_resumo_vendas_mensal;
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  VIEW: view_cliente_top_5
+  --------------------------------------------------------------------
+  ➤ Conteúdo:
+    • Top 5 clientes por valor_total (somente pedidos FINALIZADOS)
+    • total_pedidos   – nº de pedidos finalizados
+    • total_gasto     – soma valor_total
+  ➤ Consulta:
+      SELECT * FROM view_cliente_top_5;
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  VIEW: view_clientes_vip
+  --------------------------------------------------------------------
+  ➤ Conteúdo por cliente:
+    • total_pedidos         – nº de pedidos FINALIZADOS
+    • valor_total_compras   – soma desses pedidos
+    • ticket_medio          – média por pedido
+    • ultima_compra         – data do pedido mais recente
+  ➤ Consulta:
+      SELECT * FROM view_clientes_vip;
+--------------------------------------------------------------------*/
+
+
+
+
 -- 1.gera um resumo financeiro por cliente com totais de pedidos,valores e contagem de atrasos,por periodo
 CREATE OR REPLACE FUNCTION relatorio_financeiro(
     data_inicio DATE DEFAULT CURRENT_DATE - INTERVAL '1 month',
@@ -186,8 +332,6 @@ END;
 $$;
 
 
-
-
 ----------------------------------------------------------
 				--TRIGGER--
 ----------------------------------------------------------
@@ -282,4 +426,3 @@ CREATE INDEX idx_pedido_data_pedido ON pedido(data_pedido);
 CREATE INDEX idx_pedido_id_cliente ON pedido(id_cliente);
 CREATE INDEX idx_itempedido_id_pedido ON item_pedido(id_pedido);
 
-CALL procedure_alerta_produto_sem_estoque();

@@ -71,7 +71,9 @@ DATA TIMESTAMP DEFAULT NOW(),
 FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
 );
 
+ALTER TABLE produto ADD COLUMN estoque INT DEFAULT 0;
 
+UPDATE produto SET estoque = 0 WHERE id_produto = 1;
 
 INSERT INTO CLIENTE (nome, cpf_cnpj, email, telefone, endereco) VALUES 
 ('João da Silva', '123.456.789-00', 'joao@email.com', '48999990001', 'Rua A, 123 - Centro'),
@@ -469,7 +471,26 @@ CREATE INDEX idx_pedido_data_pedido ON pedido(data_pedido);
 CREATE INDEX idx_pedido_id_cliente ON pedido(id_cliente);
 CREATE INDEX idx_itempedido_id_pedido ON item_pedido(id_pedido);
 
-ALTER TABLE produto ADD COLUMN estoque INT DEFAULT 0;
+--FUNCTIONS
+--1 function
+SELECT * FROM relatorio_financeiro('2025-06-01', '2025-06-30');
+--2
+SELECT * FROM clientes_fieis(2, '2025-06-01', '2025-06-30');
+--3
+SELECT * FROM pedidos_acima_da_media();
 
-UPDATE produto SET estoque = 0 WHERE id_produto = 1;
+--PROCEDURES
+--1 procedure
+call procedure_alerta_produto_sem_estoque();
+--2
+call procedure_top_clientes_cada_mes(2025);
+--3
+call procedure_produtos_estagnados();
 
+--VIEWS
+--1 view
+SELECT * FROM view_resumo_vendas_mensal;
+--2
+SELECT * FROM view_cliente_top_5;
+--3
+SELECT * FROM view_clientes_vip;
