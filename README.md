@@ -17,7 +17,7 @@ O diretório `database/` contém os scripts SQL para a criação de tabelas, rel
 
 ## Modelo do Banco de Dados
 
-Veja o modelo relacional completo: ![Modelo](https://github.com/brunotesckemartins/BD2/blob/main/Modelo.png))
+Veja o modelo relacional completo: ![Modelo](https://github.com/brunotesckemartins/BD2/blob/main/Modelo.png)
 
 ## Estrutura do Projeto
 
@@ -124,13 +124,152 @@ Com o banco de dados e a API rodando, vamos iniciar o frontend.
 
 Agora você deve ver a aplicação web funcionando e se comunicando com o seu banco de dados através da API.
 
-## Comentários importantes nos commits
+## Comentários importantes em database/procedure/procedure.sql
 
-Durante o desenvolvimento, foram destacados nos commits pontos importantes para o entendimento do código, principalmente em:
+```text
+/*====================================================================
+  VISÃO GERAL — TIPOS DE OBJETOS NO SCRIPT
+  --------------------------------------------------------------------
+  • FUNCTIONS  : retornam dados (relatórios, cálculos, filtros reutilizáveis)
+  • PROCEDURES : executam ações administrativas / de manutenção
+  • TRIGGERS   : gatilhos automáticos disparados em INSERT/UPDATE/DELETE
+  • VIEWS      : consultas salvas como “tabelas virtuais” para relatórios
+====================================================================*/
 
-*   **Triggers:** Automatizam verificações e atualizações no banco.
-*   **Functions:** Funções SQL que encapsulam lógicas complexas para reuso.
-*   **Índices e Índices compostos:** Essenciais para otimizar o desempenho nas consultas mais frequentes.
+/*====================================================================
+  FUNCTIONS
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  FUNCTION: relatorio_financeiro(
+              data_inicio DATE DEFAULT CURRENT_DATE-INTERVAL '1 month',
+              data_fim    DATE DEFAULT CURRENT_DATE)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Para cada cliente devolve:
+      - total de pedidos
+      - total pago
+      - total pendente
+      - quantidade de pedidos em atraso
+  ➤ Como usar:
+      SELECT * FROM relatorio_financeiro('2025-06-01','2025-06-30');
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  FUNCTION: clientes_fieis(
+              min_pedidos INT DEFAULT 1,
+              data_inicio DATE DEFAULT '2020-01-01',
+              data_fim    DATE DEFAULT CURRENT_DATE)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Lista clientes que fizeram pelo menos <min_pedidos>
+      pedidos FINALIZADOS no intervalo.
+    • Calcula o ticket médio (valor médio gasto por pedido).
+  ➤ Como usar:
+      SELECT * FROM clientes_fieis(2,'2025-06-01','2025-06-30');
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  FUNCTION: pedidos_acima_da_media()
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Devolve todos os pedidos cujo valor_total é maior
+      que a média de todos os pedidos.
+  ➤ Como usar:
+      SELECT * FROM pedidos_acima_da_media();
+--------------------------------------------------------------------*/
+
+/*====================================================================
+  PROCEDURES
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  PROCEDURE: procedure_alerta_produto_sem_estoque()
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Procura produtos com estoque = 0.
+    • Insere alerta na tabela LOG e exibe RAISE NOTICE.
+  ➤ Como usar:
+      CALL procedure_alerta_produto_sem_estoque();
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  PROCEDURE: procedure_top_clientes_cada_mes(ano INT DEFAULT ano atual)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Para cada mês do ano informado mostra, via NOTICE,
+      o cliente que mais gastou (pedidos FINALIZADOS).
+  ➤ Como usar:
+      CALL procedure_top_clientes_cada_mes(2025);
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  PROCEDURE: procedure_produtos_estagnados()
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Lista produtos sem nenhuma venda FINALIZADA
+      nos últimos 3 meses (RAISE NOTICE linha a linha).
+  ➤ Como usar:
+      CALL procedure_produtos_estagnados();
+--------------------------------------------------------------------*/
+
+/*====================================================================
+  TRIGGERS
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  TRIGGER: tg_bloquear_pagamento_duplicado  (BEFORE INSERT ON CONTA_RECEBER)
+  --------------------------------------------------------------------
+  ➤ O que faz?
+    • Impede lançar duas vezes o mesmo pagamento (mesmo id_pedido,
+      valor e data_pagamento).
+    • Quando detecta duplicidade:
+        - grava alerta na tabela LOG
+        - lança EXCEPTION cancelando o INSERT
+  ➤ Como testar:
+      -- 1ª inserção OK
+      INSERT INTO conta_receber (..., valor, data_pagamento) VALUES (...);
+      -- 2ª (mesmos valores) → erro gerado pelo trigger
+--------------------------------------------------------------------*/
+
+/*====================================================================
+  VIEWS
+====================================================================*/
+
+/*--------------------------------------------------------------------
+  VIEW: view_resumo_vendas_mensal
+  --------------------------------------------------------------------
+  ➤ Conteúdo:
+    • mês (DATE_TRUNC 'month')
+    • total_pedidos  – quantidade de pedidos FINALIZADOS no mês
+    • total_vendido  – soma valor_total desses pedidos
+  ➤ Consulta:
+      SELECT * FROM view_resumo_vendas_mensal;
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  VIEW: view_cliente_top_5
+  --------------------------------------------------------------------
+  ➤ Conteúdo:
+    • Top 5 clientes por valor_total (somente pedidos FINALIZADOS)
+    • total_pedidos   – nº de pedidos finalizados
+    • total_gasto     – soma valor_total
+  ➤ Consulta:
+      SELECT * FROM view_cliente_top_5;
+--------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------
+  VIEW: view_clientes_vip
+  --------------------------------------------------------------------
+  ➤ Conteúdo por cliente:
+    • total_pedidos         – nº de pedidos FINALIZADOS
+    • valor_total_compras   – soma desses pedidos
+    • ticket_medio          – média por pedido
+    • ultima_compra         – data do pedido mais recente
+  ➤ Consulta:
+      SELECT * FROM view_clientes_vip;
+--------------------------------------------------------------------*/
+```
 
 Acesse esses comentários [aqui.](https://github.com/brunotesckemartins/BD2/commit/26d9c0842325ad24d8ff00599b24c3ce1cd2f530)
 
