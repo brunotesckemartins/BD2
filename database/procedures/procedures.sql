@@ -281,3 +281,5 @@ CREATE INDEX idx_pedido_status ON pedido(status);
 CREATE INDEX idx_pedido_data_pedido ON pedido(data_pedido);
 CREATE INDEX idx_pedido_id_cliente ON pedido(id_cliente);
 CREATE INDEX idx_itempedido_id_pedido ON item_pedido(id_pedido);
+
+CALL procedure_alerta_produto_sem_estoque();

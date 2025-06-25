@@ -373,7 +373,7 @@ END;
 $$;
 
 
-
+CALL procedure_alerta_produto_sem_estoque();
 
 ----------------------------------------------------------
 				--TRIGGER--
@@ -469,12 +469,7 @@ CREATE INDEX idx_pedido_data_pedido ON pedido(data_pedido);
 CREATE INDEX idx_pedido_id_cliente ON pedido(id_cliente);
 CREATE INDEX idx_itempedido_id_pedido ON item_pedido(id_pedido);
 
+ALTER TABLE produto ADD COLUMN estoque INT DEFAULT 0;
 
-
-
-
-
-
-
-
+UPDATE produto SET estoque = 0 WHERE id_produto = 1;
 

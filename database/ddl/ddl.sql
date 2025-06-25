@@ -81,3 +81,7 @@ ALTER TABLE CONTA_RECEBER ADD COLUMN id_forma_pagamento INT;
 ALTER TABLE CONTA_RECEBER ADD CONSTRAINT fk_conta_forma_pagamento FOREIGN KEY (id_forma_pagamento) REFERENCES FORMA_PAGAMENTO(id_forma);
 -- essas alteracoes fazem a relacao de quem realizou cada pedido, como cada pedido foi feito
 -- e como cada conta a receber foi quitada
+
+ALTER TABLE produto ADD COLUMN estoque INT DEFAULT 0;
+
+UPDATE produto SET estoque = 0 WHERE id_produto = 1;
