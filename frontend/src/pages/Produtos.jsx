@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 
 // --- Componente Modal ---
-// Um modal genérico para o formulário de Adicionar/Editar
+// Modal genérico para exibir formulários de adicionar/editar
 const Modal = ({ children, isOpen, onClose }) => {
   if (!isOpen) return null;
 
@@ -12,11 +12,11 @@ const Modal = ({ children, isOpen, onClose }) => {
     left: 0,
     width: '100%',
     height: '100%',
-    background: 'rgba(0, 0, 0, 0.5)',
+    background: 'rgba(0, 0, 0, 0.5)', // Fundo semi-transparente
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
+    zIndex: 1000, // Fica acima de outros elementos
   };
 
   const modalStyle = {
@@ -25,11 +25,13 @@ const Modal = ({ children, isOpen, onClose }) => {
     borderRadius: '8px',
     width: '90%',
     maxWidth: '500px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)', // Sombra sutil
   };
 
   return (
+    // Ao clicar no fundo, fecha o modal
     <div style={backdropStyle} onClick={onClose}>
+      {/* Evita fechar o modal ao clicar dentro do conteúdo */}
       <div style={modalStyle} onClick={e => e.stopPropagation()}>
         {children}
       </div>
@@ -40,17 +42,21 @@ const Modal = ({ children, isOpen, onClose }) => {
 
 // --- Componente Principal da Página ---
 function Produtos() {
-  // Estados para os dados
+  // Estados para armazenar os dados da API
   const [produtos, setProdutos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   
-  // Estados para controle da UI
+  // Estados para controle da interface (loading e erros)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Controle da abertura do modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Estados para o formulário
-  const [editingProduto, setEditingProduto] = useState(null); // Se for null, é Adicionar. Se tiver um objeto, é Editar.
+  // Estado que armazena o produto que está sendo editado (null para adicionar)
+  const [editingProduto, setEditingProduto] = useState(null);
+
+  // Estado que armazena os dados do formulário
   const [formData, setFormData] = useState({
     nome: '',
     preco: '',
@@ -58,7 +64,7 @@ function Produtos() {
     estoque: 0,
   });
 
-  // Efeito para buscar os dados da API quando o componente é montado
+  // Busca produtos e categorias na API ao montar o componente
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -82,10 +88,10 @@ function Produtos() {
     fetchData();
   }, []);
 
-  // Funções para controlar o Modal
+  // Abre o modal e, se for edição, preenche o formulário com dados existentes
   const handleOpenModal = (produto = null) => {
     if (produto) {
-      // Editando: preenche o formulário com os dados do produto
+      // Editar produto: carrega os dados no formulário
       setEditingProduto(produto);
       setFormData({
         nome: produto.nome,
@@ -94,46 +100,57 @@ function Produtos() {
         estoque: produto.estoque,
       });
     } else {
-      // Adicionando: limpa o formulário
+      // Adicionar produto: limpa o formulário
       setEditingProduto(null);
       setFormData({ nome: '', preco: '', id_categoria: '', estoque: 0 });
     }
     setIsModalOpen(true);
   };
 
+  // Fecha o modal e reseta o estado de edição
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingProduto(null);
   };
   
-  // Função para lidar com mudanças nos inputs do formulário
+  // Atualiza o estado do formulário ao digitar/selecionar um campo
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Converte para número inteiro no campo estoque para evitar strings
+    if (name === 'estoque') {
+      setFormData(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  // Função para submeter o formulário (Adicionar ou Editar)
+  // Trata o envio do formulário para adicionar ou editar
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Validação simples
+    // Validação básica dos campos obrigatórios
     if (!formData.nome || !formData.preco || !formData.id_categoria) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
     
-    const dataToSubmit = { ...formData, preco: parseFloat(formData.preco), estoque: parseInt(formData.estoque) };
+    // Preparar os dados para envio, convertendo preços e estoque
+    const dataToSubmit = { 
+      ...formData, 
+      preco: parseFloat(formData.preco), 
+      estoque: parseInt(formData.estoque) 
+    };
 
     try {
       if (editingProduto) {
-        // --- Lógica de EDIÇÃO ---
+        // Atualiza o produto existente
         const response = await api.put(`/produtos/${editingProduto.id_produto}`, dataToSubmit);
         setProdutos(produtos.map(p => (p.id_produto === editingProduto.id_produto ? response.data[0] : p)));
         alert("Produto atualizado com sucesso!");
       } else {
-        // --- Lógica de ADIÇÃO ---
+        // Cria um novo produto
         const response = await api.post('/produtos', dataToSubmit);
-        // A API retorna o produto criado, então o adicionamos à lista
         setProdutos([...produtos, response.data[0]]);
         alert("Produto adicionado com sucesso!");
       }
@@ -144,7 +161,7 @@ function Produtos() {
     }
   };
 
-  // Função para deletar um produto
+  // Função para deletar um produto após confirmação do usuário
   const handleDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja remover este produto?")) {
       try {
@@ -158,7 +175,7 @@ function Produtos() {
     }
   };
 
-  // --- Estilos ---
+  // --- Estilos inline para a tabela e botões ---
   const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px' };
   const thTdStyle = { border: '1px solid #ddd', padding: '12px', textAlign: 'left' };
   const buttonStyle = { marginRight: '8px', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' };
@@ -169,9 +186,11 @@ function Produtos() {
   const labelStyle = { display: 'block', marginBottom: '5px', fontWeight: 'bold' };
   const inputStyle = { width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ccc' };
 
+  // Exibe loading ou erro caso necessário
   if (loading) return <p>Carregando produtos e categorias...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
+  // Renderiza a tabela e o modal com formulário
   return (
     <div>
       <h1>Gerenciamento de Produtos</h1>
@@ -195,8 +214,11 @@ function Produtos() {
             <tr key={produto.id_produto}>
               <td style={thTdStyle}>{produto.id_produto}</td>
               <td style={thTdStyle}>{produto.nome}</td>
-              <td style={thTdStyle}>{parseFloat(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+              <td style={thTdStyle}>
+                {parseFloat(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </td>
               <td style={thTdStyle}>{produto.estoque}</td>
+              {/* Produto já vem com o nome da categoria associado */}
               <td style={thTdStyle}>{produto.nome_categoria}</td>
               <td style={thTdStyle}>
                 <button onClick={() => handleOpenModal(produto)} style={editButtonStyle}>Editar</button>
@@ -207,7 +229,7 @@ function Produtos() {
         </tbody>
       </table>
 
-      {/* --- Modal de Adicionar/Editar --- */}
+      {/* --- Modal para adicionar ou editar produto --- */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2>{editingProduto ? 'Editar Produto' : 'Adicionar Novo Produto'}</h2>
         <form onSubmit={handleFormSubmit}>

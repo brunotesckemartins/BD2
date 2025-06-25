@@ -5,6 +5,7 @@ import api from '../services/api';
 const Modal = ({ children, isOpen, onClose }) => {
   if (!isOpen) return null;
 
+  // Estilos do fundo escuro e da caixa do modal
   const backdropStyle = {
     position: 'fixed',
     top: 0,
@@ -39,21 +40,21 @@ const Modal = ({ children, isOpen, onClose }) => {
 
 // --- Componente Principal da Página ---
 function FormasPagamento() {
-  // Estados para os dados
+  // --- Estados para os dados ---
   const [formasPagamento, setFormasPagamento] = useState([]);
-  
-  // Estados para controle da UI
+
+  // --- Estados de controle da interface ---
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Estados para o formulário
+
+  // --- Estados para o formulário (adicionar/editar) ---
   const [editingForma, setEditingForma] = useState(null);
   const [formData, setFormData] = useState({
     descricao: '',
   });
 
-  // Efeito para buscar os dados da API
+  // --- Carrega os dados da API ao iniciar o componente ---
   useEffect(() => {
     async function fetchFormasPagamento() {
       setLoading(true);
@@ -68,16 +69,15 @@ function FormasPagamento() {
         setLoading(false);
       }
     }
+
     fetchFormasPagamento();
   }, []);
 
-  // Funções para controlar o Modal
+  // --- Abre o modal com ou sem dados preenchidos (edição ou criação) ---
   const handleOpenModal = (forma = null) => {
     if (forma) {
       setEditingForma(forma);
-      setFormData({
-        descricao: forma.descricao,
-      });
+      setFormData({ descricao: forma.descricao });
     } else {
       setEditingForma(null);
       setFormData({ descricao: '' });
@@ -85,18 +85,19 @@ function FormasPagamento() {
     setIsModalOpen(true);
   };
 
+  // --- Fecha o modal ---
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingForma(null);
   };
-  
-  // Função para lidar com mudanças nos inputs do formulário
+
+  // --- Atualiza os dados do formulário conforme o usuário digita ---
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Função para submeter o formulário (Adicionar ou Editar)
+  // --- Envia o formulário (para adicionar ou editar) ---
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
@@ -104,14 +105,16 @@ function FormasPagamento() {
       alert("Por favor, preencha a descrição.");
       return;
     }
-    
+
     const dataToSubmit = { ...formData };
 
     try {
       if (editingForma) {
         // --- Lógica de EDIÇÃO ---
         const response = await api.put(`/formas-pagamento/${editingForma.id_forma}`, dataToSubmit);
-        setFormasPagamento(formasPagamento.map(f => (f.id_forma === editingForma.id_forma ? response.data[0] : f)));
+        setFormasPagamento(formasPagamento.map(f =>
+          f.id_forma === editingForma.id_forma ? response.data[0] : f
+        ));
         alert("Forma de pagamento atualizada com sucesso!");
       } else {
         // --- Lógica de ADIÇÃO ---
@@ -126,7 +129,7 @@ function FormasPagamento() {
     }
   };
 
-  // Função para deletar uma forma de pagamento
+  // --- Remove uma forma de pagamento após confirmação ---
   const handleDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja remover esta forma de pagamento?")) {
       try {
@@ -135,22 +138,23 @@ function FormasPagamento() {
         alert("Forma de pagamento removida com sucesso!");
       } catch (err) {
         console.error("Erro ao remover forma de pagamento:", err);
-        alert(`Falha ao remover. Verifique se esta forma de pagamento não está vinculada a um pedido ou conta.`);
+        alert("Falha ao remover. Verifique se esta forma de pagamento não está vinculada a um pedido ou conta.");
       }
     }
   };
 
-  // --- Estilos ---
+  // --- Estilos da página ---
   const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px' };
   const thTdStyle = { border: '1px solid #ddd', padding: '12px', textAlign: 'left' };
   const buttonStyle = { marginRight: '8px', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' };
-  const editButtonStyle = { ...buttonStyle, backgroundColor: '#3498db', color: 'white'};
-  const deleteButtonStyle = { ...buttonStyle, backgroundColor: '#e74c3c', color: 'white'};
-  const addButtonStyle = { ...buttonStyle, backgroundColor: '#2ecc71', color: 'white', fontSize: '16px', padding: '10px 15px'};
+  const editButtonStyle = { ...buttonStyle, backgroundColor: '#3498db', color: 'white' };
+  const deleteButtonStyle = { ...buttonStyle, backgroundColor: '#e74c3c', color: 'white' };
+  const addButtonStyle = { ...buttonStyle, backgroundColor: '#2ecc71', color: 'white', fontSize: '16px', padding: '10px 15px' };
   const formGroupStyle = { marginBottom: '15px' };
   const labelStyle = { display: 'block', marginBottom: '5px', fontWeight: 'bold' };
   const inputStyle = { width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ccc' };
 
+  // --- Renderiza tela de carregamento ou erro ---
   if (loading) return <p>Carregando formas de pagamento...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
@@ -161,6 +165,7 @@ function FormasPagamento() {
         Adicionar Forma de Pagamento
       </button>
 
+      {/* --- Tabela de Formas de Pagamento --- */}
       <table style={tableStyle}>
         <thead>
           <tr>
@@ -183,16 +188,23 @@ function FormasPagamento() {
         </tbody>
       </table>
 
-      {/* --- Modal de Adicionar/Editar --- */}
+      {/* --- Modal para Adicionar/Editar Forma --- */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2>{editingForma ? 'Editar Forma de Pagamento' : 'Adicionar Nova Forma de Pagamento'}</h2>
         <form onSubmit={handleFormSubmit}>
           <div style={formGroupStyle}>
             <label style={labelStyle}>Descrição*</label>
-            <input type="text" name="descricao" value={formData.descricao} onChange={handleFormChange} style={inputStyle} required />
+            <input
+              type="text"
+              name="descricao"
+              value={formData.descricao}
+              onChange={handleFormChange}
+              style={inputStyle}
+              required
+            />
           </div>
           <div style={{ textAlign: 'right', marginTop: '20px' }}>
-            <button type="button" onClick={handleCloseModal} style={{...buttonStyle, backgroundColor: '#bdc3c7'}}>Cancelar</button>
+            <button type="button" onClick={handleCloseModal} style={{ ...buttonStyle, backgroundColor: '#bdc3c7' }}>Cancelar</button>
             <button type="submit" style={addButtonStyle}>Salvar</button>
           </div>
         </form>

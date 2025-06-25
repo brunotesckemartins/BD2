@@ -36,21 +36,20 @@ const Modal = ({ children, isOpen, onClose }) => {
   );
 };
 
-
 // --- Componente Principal da Página ---
 function Pedidos() {
-  // Estados para os dados
+  // --- Estados para armazenar os dados ---
   const [pedidos, setPedidos] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [formasPagamento, setFormasPagamento] = useState([]);
 
-  // Estados para controle da UI
+  // --- Estados para controle da interface ---
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Estados para o formulário
+  // --- Estados para controle do formulário ---
   const [editingPedido, setEditingPedido] = useState(null);
   const [formData, setFormData] = useState({
     id_cliente: '',
@@ -61,13 +60,13 @@ function Pedidos() {
     id_forma_pagamento: '',
   });
 
-  // Efeito para buscar todos os dados necessários de forma resiliente
+  // --- Efeito para carregar dados essenciais e secundários de forma resiliente ---
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       setError(null);
       try {
-        // Buscamos os dados essenciais primeiro (pedidos e clientes)
+        // Busca dados essenciais (pedidos e clientes) simultaneamente
         const [pedidosRes, clientesRes] = await Promise.all([
           api.get('/pedidos'),
           api.get('/clientes')
@@ -76,20 +75,19 @@ function Pedidos() {
         setPedidos(pedidosRes.data || []);
         setClientes(clientesRes.data || []);
 
-        // Buscamos dados secundários (para os formulários) separadamente.
-        // Se falharem, a página principal ainda funciona.
+        // Busca dados secundários (usuarios e formas de pagamento) separadamente
         try {
           const usuariosRes = await api.get('/usuarios');
           setUsuarios(usuariosRes.data || []);
         } catch (err) {
-            console.warn("Aviso: Não foi possível carregar os usuários.", err.message);
+          console.warn("Aviso: Não foi possível carregar os usuários.", err.message);
         }
 
         try {
           const formasPagamentoRes = await api.get('/formas-pagamento');
           setFormasPagamento(formasPagamentoRes.data || []);
         } catch (err) {
-            console.warn("Aviso: Não foi possível carregar as formas de pagamento.", err.message);
+          console.warn("Aviso: Não foi possível carregar as formas de pagamento.", err.message);
         }
 
       } catch (err) {
@@ -102,7 +100,7 @@ function Pedidos() {
     fetchData();
   }, []);
 
-  // Funções para controlar o Modal
+  // --- Função para abrir o modal e carregar dados no formulário (edição ou criação) ---
   const handleOpenModal = (pedido = null) => {
     if (pedido) {
       setEditingPedido(pedido);
@@ -128,38 +126,44 @@ function Pedidos() {
     setIsModalOpen(true);
   };
 
+  // --- Função para fechar o modal e limpar estado de edição ---
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingPedido(null);
   };
   
+  // --- Função para atualizar o estado do formulário ao modificar campos ---
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // --- Função para enviar o formulário (adicionar ou editar pedido) ---
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
+    // Validação simples dos campos obrigatórios
     if (!formData.id_cliente || !formData.data_pedido || !formData.valor_total) {
       alert("Por favor, preencha Cliente, Data do Pedido e Valor Total.");
       return;
     }
     
     const dataToSubmit = { 
-        ...formData, 
-        valor_total: parseFloat(formData.valor_total),
-        id_usuario: formData.id_usuario || null,
-        id_forma_pagamento: formData.id_forma_pagamento || null,
+      ...formData, 
+      valor_total: parseFloat(formData.valor_total),
+      id_usuario: formData.id_usuario || null,
+      id_forma_pagamento: formData.id_forma_pagamento || null,
     };
 
     try {
       if (editingPedido) {
+        // Atualiza pedido existente
         const response = await api.put(`/pedidos/${editingPedido.id_pedido}`, dataToSubmit);
-        // Atualiza a lista localmente para não depender da resposta da API ter joins
+        // Atualiza lista localmente
         setPedidos(pedidos.map(p => (p.id_pedido === editingPedido.id_pedido ? { ...p, ...response.data[0] } : p)));
         alert("Pedido atualizado com sucesso!");
       } else {
+        // Adiciona novo pedido
         const response = await api.post('/pedidos', dataToSubmit);
         setPedidos([...pedidos, response.data[0]]);
         alert("Pedido adicionado com sucesso!");
@@ -171,6 +175,7 @@ function Pedidos() {
     }
   };
 
+  // --- Função para remover um pedido ---
   const handleDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja remover este pedido?")) {
       try {
@@ -184,7 +189,7 @@ function Pedidos() {
     }
   };
 
-  // --- Estilos ---
+  // --- Estilos para a tabela e botões ---
   const tableStyle = { width: '100%', borderCollapse: 'collapse', marginTop: '20px' };
   const thTdStyle = { border: '1px solid #ddd', padding: '12px', textAlign: 'left' };
   const buttonStyle = { marginRight: '8px', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' };
@@ -195,9 +200,11 @@ function Pedidos() {
   const labelStyle = { display: 'block', marginBottom: '5px', fontWeight: 'bold' };
   const inputStyle = { width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ccc' };
 
+  // --- Exibição condicional para loading e erro ---
   if (loading) return <p>Carregando dados...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
+  // --- Renderização do componente ---
   return (
     <div>
       <h1>Gerenciamento de Pedidos</h1>
@@ -221,7 +228,7 @@ function Pedidos() {
             <tr key={pedido.id_pedido}>
               <td style={thTdStyle}>{pedido.id_pedido}</td>
               <td style={thTdStyle}>
-                {/* Lógica para encontrar o nome do cliente no array de clientes */}
+                {/* Exibe nome do cliente, ou ID se não encontrado */}
                 {clientes.find(c => c.id_cliente === pedido.id_cliente)?.nome || `ID: ${pedido.id_cliente}`}
               </td>
               <td style={thTdStyle}>{new Date(pedido.data_pedido).toLocaleDateString('pt-BR')}</td>
@@ -236,6 +243,7 @@ function Pedidos() {
         </tbody>
       </table>
 
+      {/* --- Modal para adicionar/editar pedido --- */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2>{editingPedido ? 'Editar Pedido' : 'Adicionar Novo Pedido'}</h2>
         <form onSubmit={handleFormSubmit}>
