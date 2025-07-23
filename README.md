@@ -130,7 +130,6 @@ Agora você deve ver a aplicação web funcionando e se comunicando com o seu ba
 
 **Bruno Tescke Martins**
 *   E-mail: brunotesckemartins@gmail.com
-*   [Github](https://github.com/brunotesckemartins)
 
 ## Colaboradores:
 
